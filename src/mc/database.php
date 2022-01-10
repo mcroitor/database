@@ -44,8 +44,7 @@ class database {
                 $array = $result->fetchAll(\PDO::FETCH_ASSOC);
             }
         } catch (\PDOException $ex) {
-            \core\logger::stdout()->error($ex->getMessage());
-            \core\logger::stdout()->error("query: " . $query);
+            exit ($ex->getMessage() . ", query: " . $query);
         }
         return $array;
     }
@@ -164,4 +163,12 @@ class database {
         return count($result) >0 && $result[0]["count"] > 0;
     }
 
+    /**
+     * 
+     * @param string $table
+     * @param string $column
+     */
+    public function unique_values(string $table, string $column): array {
+        return $this->query_sql("SELECT {$column} FROM {$table} GROUP BY {$column}");
+    }
 }
