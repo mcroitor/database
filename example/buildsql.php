@@ -21,3 +21,14 @@ $query = query::insert()
     ->build();
 
 echo $query . PHP_EOL;
+
+$query = new query([
+    query::TYPE => query::SELECT,
+    query::TABLE => 'variable',
+    query::FIELDS => ['name', 'value'],
+    query::WHERE => ['name' => 'theme'],
+    query::ORDER => ['name' => 'ASC'],
+    query::LIMIT => ['limit' => 1],
+]);
+
+echo $query->build() . PHP_EOL;

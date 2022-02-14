@@ -201,7 +201,9 @@ class query {
         }
         $tmp = [];
         $tmp[] = "LIMIT " . $this->limit["limit"];
-        $tmp[] = "OFFSET " . $this->limit["offset"];
+        if(isset($this->limit["offset"])){
+            $tmp[] = "OFFSET " . $this->limit["offset"];
+        }
         return \implode(" ", $tmp);
     }
 }
