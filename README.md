@@ -1,10 +1,10 @@
 # database
-simple PHP library, PDO wrapper
+simple PHP library, PDO wrapper. Library provides an SQL builder also.
 
 ## interface
 
 ```php
-namespace mc;
+namespace mc\sql;
 
 class database {
 
@@ -78,4 +78,43 @@ class database {
     public function unique_values(string $table, string $column): array;
 }
 
+```
+
+```php
+namespace mc\sql;
+
+class query {
+    public const SELECT = "SELECT";
+    public const INSERT = "INSERT";
+    public const UPDATE = "UPDATE";
+    public const DELETE = "DELETE";
+
+    public const TYPE = "type";
+    public const TABLE = "table";
+    public const FIELDS = "fields";
+    public const VALUES = "values";
+    public const WHERE = "where";
+    public const ORDER = "order";
+    public const LIMIT = "limit";
+
+    public function __construct(array $config);
+    public function get_type(): string;
+    public static function select(): query;
+    public static function insert(): query;
+    public static function update(): query;
+    public static function delete(): query;
+    public function clone(): query;
+    public function fields(array $fields): query;
+    public function values(array $values): query;
+    public function where(array $where): query;
+    public function order(array $order): query;
+    public function limit(int $limit, int $offset = 0): query;
+    public function table(string $table): query;
+    public function build(): string;
+    protected function build_fields(): string;
+    protected function build_values(): string;
+    protected function build_where(): string;
+    protected function build_order(): string;
+    protected function build_limit(): string;
+}
 ```

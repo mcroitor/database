@@ -1,6 +1,8 @@
 <?php
 
-namespace mc;
+namespace mc\sql;
+
+use mc\sql\query;
 
 /**
  * PDO wrapper
@@ -8,6 +10,11 @@ namespace mc;
  * @author Croitor Mihail <mcroitor@gmail.com>
  */
 class database {
+
+    public const LIMIT1 = [
+        'limit' => 1,
+        'offset' => 0
+    ];
 
     private $pdo;
 
@@ -81,7 +88,7 @@ class database {
      * @param string $table
      * @param array $data enumerate columns for selection. Sample: ['id', 'name'].
      * @param array $where associative conditions.
-     * @param array $limit definition sample: ['from' => '1', 'total' => '100'].
+     * @param array $limit definition sample: ['offset' => '1', 'limit' => '100'].
      * @return array
      */
     public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array {
@@ -96,7 +103,7 @@ class database {
             $query .= " WHERE " . \implode(" AND ", $tmp);
         }
         if (!empty($limit)) {
-            $query .= " LIMIT {$limit['from']}, {$limit['total']}";
+            $query .= " LIMIT {$limit['offset']}, {$limit['limit']}";
         }
 
         return $this->query_sql($query);
@@ -170,5 +177,13 @@ class database {
      */
     public function unique_values(string $table, string $column): array {
         return $this->query_sql("SELECT {$column} FROM {$table} GROUP BY {$column}");
+    }
+    
+    /**
+     * @param query $query
+     * @return array
+     */
+    public function exec(query $query): array {
+        return $this->query_sql($query->build(), "Error: ", $query->get_type() === query::SELECT);
     }
 }
