@@ -1,3 +1,4 @@
 /nbproject/
 /meta/
 *.db
+/**/*.log
