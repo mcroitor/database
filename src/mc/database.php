@@ -171,7 +171,7 @@ class database {
     }
 
     /**
-     * 
+     * Select unique values from column.
      * @param string $table
      * @param string $column
      */
@@ -180,6 +180,7 @@ class database {
     }
     
     /**
+     * Execute a query object.
      * @param query $query
      * @return array
      */

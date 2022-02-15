@@ -71,11 +71,18 @@ class database {
     public function exists(string $table, array $where): bool;
 
     /**
-     * 
+     * Select unique values from column.
      * @param string $table
      * @param string $column
      */
     public function unique_values(string $table, string $column): array;
+
+    /**
+     * Execute a query object.
+     * @param query $query
+     * @return array
+     */
+    public function exec(\mc\sql\query $query): array;
 }
 
 ```

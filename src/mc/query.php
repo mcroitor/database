@@ -96,6 +96,10 @@ class query {
         ]);
     }
 
+    /**
+     * clone a query
+     * @return query
+     */
     public function clone(): query {
         return new query([
             self::TYPE => $this->type,
@@ -108,30 +112,55 @@ class query {
         ]);
     }
 
+    /**
+     * set fields and return new query
+     * @param array $fields
+     * @return query
+     */
     public function fields(array $fields): query {
         $result = $this->clone();
         $result->fields = $fields;
         return $result;
     }
 
+    /**
+     * set values and return new query
+     * @param array $values
+     * @return query
+     */
     public function values(array $values): query {
         $result = $this->clone();
         $result->values = $values;
         return $result;
     }
 
+    /**
+     * set where conditions and return new query
+     * @param array $where
+     * @return query
+     */
     public function where(array $where): query {
         $result = $this->clone();
         $result->where = $where;
         return $result;
     }
 
+    /**
+     * set order conditions and return new query
+     * @param array $order
+     * @return query
+     */
     public function order(array $order): query {
         $result = $this->clone();
         $result->order = $order;
         return $result;
     }
 
+    /**
+     * set limit conditions and return new query
+     * @param array $limit
+     * @return query
+     */
     public function limit(int $limit, int $offset = 0): query {
         $result = $this->clone();
         $result->limit = [
@@ -141,12 +170,21 @@ class query {
         return $result;
     }
 
+    /**
+     * set table and return new query
+     * @param string $table
+     * @return query
+     */
     public function table(string $table): query {
         $result = $this->clone();
         $result->table = $table;
         return $result;
     }
 
+    /**
+     * return query string
+     * @return string
+     */
     public function build(): string {
         $replace = [
             "%table%" => $this->table,
@@ -159,6 +197,10 @@ class query {
         return \strtr(self::PATTERN[$this->type], $replace);
     }
 
+    /**
+     * return fields string
+     * @return string
+     */
     protected function build_fields(): string {
         if(empty($this->fields)){
             return "*";
@@ -166,6 +208,10 @@ class query {
         return \implode(", ", $this->fields);
     }
 
+    /**
+     * return values string
+     * @return string
+     */
     protected function build_values(): string {
         if(empty($this->values)){
             return "";
@@ -173,6 +219,10 @@ class query {
         return \implode(", ", $this->values);
     }
 
+    /**
+     * return where string
+     * @return string
+     */
     protected function build_where(): string {
         if(empty($this->where)){
             return "";
@@ -184,6 +234,10 @@ class query {
         return "WHERE " . \implode(" AND ", $tmp);
     }
 
+    /**
+     * return order string
+     * @return string
+     */
     protected function build_order(): string {
         if(empty($this->order)){
             return "";
@@ -195,6 +249,10 @@ class query {
         return "ORDER BY " . \implode(", ", $tmp);
     }
 
+    /**
+     * return limit string
+     * @return string
+     */
     protected function build_limit(): string {
         if(!$this->limit){
             return "";
@@ -205,5 +263,13 @@ class query {
             $tmp[] = "OFFSET " . $this->limit["offset"];
         }
         return \implode(" ", $tmp);
+    }
+
+    /**
+     * convert query object to string
+     * @return string
+     */
+    public function __toString() {
+        return $this->build();
     }
 }
