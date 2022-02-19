@@ -26,10 +26,10 @@ class query {
     public const LIMIT = "limit";
 
     protected const PATTERN = [
-        self::SELECT => "SELECT %fields% FROM %table% %where% %order% %limit%",
+        self::SELECT => "SELECT %fields% FROM %table%%where%%order%%limit%",
         self::INSERT => "INSERT INTO %table% (%fields%) VALUES (%values%)",
-        self::UPDATE => "UPDATE %table% SET %values% %where%",
-        self::DELETE => "DELETE FROM %table% %where%",
+        self::UPDATE => "UPDATE %table% SET %values%%where%",
+        self::DELETE => "DELETE FROM %table%%where%",
     ];
 
     protected string $type = "";
@@ -194,7 +194,7 @@ class query {
             "%order%" => $this->build_order(),
             "%limit%" => $this->build_limit(),
         ];
-        return \strtr(self::PATTERN[$this->type], $replace);
+        return \trim(\strtr(self::PATTERN[$this->type], $replace));
     }
 
     /**
@@ -231,7 +231,7 @@ class query {
         foreach ($this->where as $key => $value) {
             $tmp[] = "{$key}='{$value}'";
         }
-        return "WHERE " . \implode(" AND ", $tmp);
+        return " WHERE " . \implode(" AND ", $tmp);
     }
 
     /**
@@ -246,7 +246,7 @@ class query {
         foreach ($this->order as $key => $value) {
             $tmp[] = "{$key} {$value}";
         }
-        return "ORDER BY " . \implode(", ", $tmp);
+        return " ORDER BY " . \implode(", ", $tmp);
     }
 
     /**
@@ -262,7 +262,7 @@ class query {
         if(isset($this->limit["offset"])){
             $tmp[] = "OFFSET " . $this->limit["offset"];
         }
-        return \implode(" ", $tmp);
+        return " " . \implode(" ", $tmp);
     }
 
     /**

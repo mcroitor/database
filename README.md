@@ -1,6 +1,24 @@
 # database
 simple PHP library, PDO wrapper. Library provides an SQL builder also.
 
+## examples
+
+### database wrapper usage
+Connection to sqlite database:
+```php
+$db = new \mc\sql\database("sqlite:sample.db");
+```
+Connection to MySQL:
+```php
+$db = new \mc\sql\database("mysql:host=localhost;dbname=database", "user", "password");
+```
+Select from table `variables` all fields:
+```php
+$db->select("variables");
+```
+
+### query builder
+
 ## interface
 
 ```php
