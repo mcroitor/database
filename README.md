@@ -73,12 +73,12 @@ class database {
     public function update(string $table, array $values, array $conditions): array;
 
     /**
-     * insert values in table
+     * insert values in table and returns id.
      * @param string $table
      * @param array $values
-     * @return void
+     * @return int
      */
-    public function insert(string $table, array $values): void;
+    public function insert(string $table, array $values): int;
 
     /**
      * Check if exists row with value(s) in table.

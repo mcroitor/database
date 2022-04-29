@@ -9,9 +9,20 @@ echo "prepare data" . PHP_EOL;
 $db->query_sql("DROP TABLE IF EXISTS variable");
 $db->query_sql("CREATE TABLE variable (name TEXT, value TEXT)");
 
-$db->insert("variable", ["name" => "theme", "value" => "default"]);
-$db->insert("variable", ["name" => "page_size", "value" => "20"]);
+$prop1 = ["name" => "theme", "value" => "default"];
+$id1 = $db->insert("variable", $prop1);
 
+echo "inserted id: {$id1}" . PHP_EOL;
+
+$prop2 = ["name" => "language", "value" => "en"];
+$id2 = $db->insert("variable", $prop2);
+
+echo "inserted id: {$id2}" . PHP_EOL;
+
+$prop3 = ["name" => "page_size", "value" => "20"];
+$id3 = $db->insert("variable", $prop3);
+
+echo "inserted id: {$id3}" . PHP_EOL;
 echo "done." . PHP_EOL;
 
 echo "test select" . PHP_EOL;

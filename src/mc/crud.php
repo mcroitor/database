@@ -27,13 +27,13 @@ class crud {
     }
 
     /**
-     * insert a new record
+     * insert a new record. Returns the id of the new record
      *
      * @param array|object $data
      */
     public function insert($data) {
         $data = (array)$data;
-        $this->_db->insert($this->table(), $data);
+        return $this->_db->insert($this->table(), $data);
     }
 
     /**
