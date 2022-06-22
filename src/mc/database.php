@@ -98,7 +98,8 @@ class database {
         if (!empty($where)) {
             $tmp = [];
             foreach ($where as $key => $value) {
-                $tmp[] = "{$key}='{$value}'";
+                $value = $this->pdo->quote($value);
+                $tmp[] = "{$key}=$value";
             }
             $query .= " WHERE " . \implode(" AND ", $tmp);
         }
@@ -135,10 +136,12 @@ class database {
     public function update(string $table, array $values, array $conditions): array {
         $tmp1 = [];
         foreach ($conditions as $key => $value) {
-            $tmp1[] = "{$key}='{$value}'";
+            $value = $this->pdo->quote($value);
+            $tmp1[] = "{$key}={$value}";
         }
         $tmp2 = [];
         foreach ($values as $key => $value) {
+            $value = $this->pdo->quote($value);
             $tmp2[] = "{$key}='{$value}'";
         }
 
@@ -153,8 +156,13 @@ class database {
      * @return int
      */
     public function insert(string $table, array $values): int {
-        $columns = \implode(", ", array_keys($values));
-        $data = '"' . \implode('",  "', array_values($values)) . '"';
+        $columns = \implode(", ", \array_keys($values));
+        // quoting values
+        $quoted_values = \array_values($values);
+        foreach($quoted_values as $key => $value) {
+            $quoted_values[$key] = $this->pdo->quote($value);
+        }
+        $data = \implode(",  ", $quoted_values);
         $query = "INSERT INTO {$table} ($columns) VALUES ({$data})";
         $this->query_sql($query, "Error: ", false);
         return $this->pdo->lastInsertId();
