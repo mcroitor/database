@@ -216,6 +216,7 @@ class query {
         if(empty($this->values)){
             return "";
         }
+        // TODO: quote values!
         return \implode(", ", $this->values);
     }
 
@@ -229,6 +230,7 @@ class query {
         }
         $tmp = [];
         foreach ($this->where as $key => $value) {
+            // TODO: quote values!
             $tmp[] = "{$key}='{$value}'";
         }
         return " WHERE " . \implode(" AND ", $tmp);

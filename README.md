@@ -1,5 +1,20 @@
 # database
-simple PHP library, PDO wrapper. Library provides an SQL builder also.
+
+Simple PHP library, PDO wrapper. Library provides an SQL builder also. You always can use 
+`database.php` file directly, it has only one dependency, from `query` class. Feel free
+to remove exec method if you don't use it.
+
+Project is defined into `\mc\sql` namespace;
+
+Project is composed from 3 classes:
+
+ * `database` - simple PDO wrapper
+ * `query` - query builder
+ * `crud` - class that implements C(reate) R(ead) U(pdate) D(elete)
+  
+Limitations:
+ * where conditions are limited with compare operator, use `query_sql` method if you want
+   to do something more complex 
 
 ## examples
 
@@ -16,8 +31,19 @@ Select from table `variables` all fields:
 ```php
 $db->select("variables");
 ```
-
 ### query builder
+
+Build select query:
+
+```php
+// query builder
+$query_builder = query::select()->table('variable');
+echo $query_builder->build();
+
+// select only 'name', 'value' fields
+$query_builder = $query_builder->fields(['name', 'value']);
+echo $query_builder->build();
+```
 
 ### crud
 
