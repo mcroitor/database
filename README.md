@@ -49,6 +49,8 @@ echo $query_builder->build();
 
 ## interface
 
+The `\mc\sql\database` class interface:
+
 ```php
 namespace mc\sql;
 
@@ -133,6 +135,7 @@ class database {
 
 ```
 
+The `\mc\sql\query` class interface:
 ```php
 namespace mc\sql;
 
@@ -169,5 +172,66 @@ class query {
     protected function build_where(): string;
     protected function build_order(): string;
     protected function build_limit(): string;
+}
+```
+
+The `\mc\sql\crud` class interface:
+```php
+namespace mc\sql;
+
+class crud {
+
+    /**
+     * crud constructor, must be passed a database object and a table name
+     * the key is the primary key of the table, defaults to 'id' 
+     * @param database $db
+     * @param string $table
+     * @param string $key
+     */
+    public function __construct(database $db, string $table, $key = "id");
+
+    /**
+     * insert a new record. Returns the id of the new record
+     *
+     * @param array|object $data
+     */
+    public function insert($data);
+
+    /**
+     * select a record by id / key
+     * 
+     * @param int|string $id
+     * @return array
+     */
+    public function select($id);
+
+    /**
+     * update a record by id / key
+     * parameter <b>$data</b> must include the key
+     * 
+     * @param array|object $data
+     */
+    public function update($data);
+
+    /**
+     * delete a record by id / key
+     * 
+     * @param int|string $id
+     */
+    public function delete($id);
+
+    /**
+     * return the table name, userd for all CRUD operations
+     * 
+     * @return string
+     */
+    public function table();
+
+    /**
+     * return the key name, userd for all CRUD operations
+     * 
+     * return string
+     */
+    public function key();
 }
 ```
