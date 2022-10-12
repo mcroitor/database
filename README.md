@@ -206,6 +206,15 @@ class crud {
     public function select($id);
 
     /**
+     * select <b>$limit</b> records from <b>$offset</b> record.
+     * 
+     * @param int $offset
+     * @param int $limit
+     * @return array 
+     */
+    public function all($offset = 0, $limit = 100);
+
+    /**
      * update a record by id / key
      * parameter <b>$data</b> must include the key
      * 
