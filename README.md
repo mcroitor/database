@@ -47,6 +47,15 @@ echo $query_builder->build();
 
 ### crud
 
+The `crud` class simplifies interogation with database.
+It provide only basic interface, based on table key:
+
+ - `insert` - creates record in the table, returns id.
+ - `select` - returns a record by id.
+ - `all` - returns an array of records.
+ - `update` - updates record by id.
+ - `delete` - removes record by id.
+
 ## interface
 
 The `\mc\sql\database` class interface:
