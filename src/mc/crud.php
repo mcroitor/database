@@ -43,7 +43,7 @@ class crud {
      * @return array
      */
     public function select($id) {
-        $result = $this->_db->select($this->table(), ["*"], [$this->key() => $id], database::LIMIT1)[0];
+        $result = $this->_db->select($this->table(), ["*"], [$this->key() => $id], database::LIMIT1);
         if(count($result) === 0) {
             return null;
         }

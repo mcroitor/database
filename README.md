@@ -13,8 +13,18 @@ Project is composed from 3 classes:
  * `crud` - class that implements C(reate) R(ead) U(pdate) D(elete)
   
 Limitations:
+ * mysql and sqlite support
  * where conditions are limited with compare operator, use `query_sql` method if you want
    to do something more complex 
+
+The `crud` class simplifies interogation with database.
+It provide only basic interface, based on table key:
+
+ - `insert` - creates record in the table, returns id.
+ - `select` - returns a record by id.
+ - `all` - returns an array of records.
+ - `update` - updates record by id.
+ - `delete` - removes record by id.
 
 ## examples
 
@@ -29,7 +39,7 @@ $db = new \mc\sql\database("mysql:host=localhost;dbname=database", "user", "pass
 ```
 Select from table `variables` all fields:
 ```php
-$db->select("variables");
+$variables = $db->select("variables");
 ```
 ### query builder
 
@@ -47,14 +57,15 @@ echo $query_builder->build();
 
 ### crud
 
-The `crud` class simplifies interogation with database.
-It provide only basic interface, based on table key:
+Sample of usage:
 
- - `insert` - creates record in the table, returns id.
- - `select` - returns a record by id.
- - `all` - returns an array of records.
- - `update` - updates record by id.
- - `delete` - removes record by id.
+```php
+$db = new \mc\sql\database("sqlite:sample.db");
+$variable = new crud($db, "variable", "name");
+
+$language = $variable->select("language");
+echo $language["name"] . ": " . $language["value"] . PHP_EOL;
+```
 
 ## interface
 
