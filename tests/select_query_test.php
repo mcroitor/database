@@ -1,15 +1,10 @@
 <?php
 
-include __DIR__ . '/../src/mc/query.php';
+use \mc\sql\query;
 
-use mc\sql\query;
+info("<== query tests ==>");
 
-function test(bool $expression, string $passed = "PASS", string $failed = "FAIL"): void {
-    echo $expression ? $passed : $failed;
-    echo PHP_EOL;
-}
-
-echo "pre-requisites: table `variable`, field `name`, field `value`" . PHP_EOL;
+echo "pre-requisites: table `variables`, field `name`, field `value`" . PHP_EOL;
 
 echo "test 1.1: select query creation" . PHP_EOL;
 echo "\ttable in not set, fields are not set" . PHP_EOL;

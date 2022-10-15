@@ -158,7 +158,7 @@ class database {
         $tmp2 = [];
         foreach ($values as $key => $value) {
             $value = $this->pdo->quote($value);
-            $tmp2[] = "{$key}='{$value}'";
+            $tmp2[] = "{$key}={$value}";
         }
 
         $query = "UPDATE {$table} SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $tmp1);
