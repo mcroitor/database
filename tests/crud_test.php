@@ -1,7 +1,5 @@
 <?php
 
-use mc\sql\crud;
-
 include __DIR__ . '/../src/mc/database.php';
 include __DIR__ . '/../src/mc/crud.php';
 
@@ -19,6 +17,8 @@ function info(string $message, $object = null): void {
 }
 
 $db = new \mc\sql\database("sqlite:". __DIR__ . "/../sample.db");
+
+info("<== CRUD tests ==>");
 
 info("=== TEST GROUP 1 ===");
 info("pre-requisites: table `variables`, field`id` - primary key, field `name`, field `value`");
