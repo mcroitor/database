@@ -111,6 +111,22 @@ class database {
     }
 
     /**
+     * select column from table
+     * @param string $table
+     * @param string $column_name column name for selection.
+     * @param array $where associative conditions.
+     * @param string $limit definition sample: ['offset' => '1', 'limit' => '100'].
+     */
+    public function select_column(string $table, string $column_name, array $where = [], array $limit = []): array {
+        $tmp = $this->select($table, [$column_name], $where, $limit);
+        $result = [];
+        foreach ($tmp as $value) {
+            $result[] = $value[$column_name];
+        }
+        return $result;
+    }
+
+    /**
      * Delete rows from table <b>$table</b>. Condition is required.
      * @param string $table
      * @param array $conditions
@@ -142,7 +158,7 @@ class database {
         $tmp2 = [];
         foreach ($values as $key => $value) {
             $value = $this->pdo->quote($value);
-            $tmp2[] = "{$key}='{$value}'";
+            $tmp2[] = "{$key}={$value}";
         }
 
         $query = "UPDATE {$table} SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $tmp1);
