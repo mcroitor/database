@@ -78,7 +78,7 @@ class crud {
      * @param int|string $id
      */
     public function delete($id) {
-        $this->db->delete($this->table(), [$this->key() => $id]);
+        $this->_db->delete($this->table(), [$this->key() => $id]);
     }
 
     /**
