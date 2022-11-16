@@ -259,8 +259,15 @@ class crud {
     /**
      * return the key name, userd for all CRUD operations
      * 
-     * return string
+     * @return string
      */
     public function key();
+
+    /**
+     * return number of lines in the associated table
+     * 
+     * @return int
+     */
+    public function count();
 }
 ```
