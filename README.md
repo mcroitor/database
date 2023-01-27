@@ -79,6 +79,11 @@ class database {
     public function __construct(string $dsn, ?string $login = null, ?string $password = null);
 
     /**
+     * Close connection. After this queries are invalid and object recreating is obligatory.
+     */
+    public function close();
+
+    /**
      * Common query method
      * @global string $site
      * @param string $query
@@ -241,6 +246,14 @@ class crud {
      * @param array|object $data
      */
     public function update($data);
+
+    /**
+     * if $data object contains key property, table will be
+     * updated, otherwise new line will be inserted.
+     *
+     * @param $data
+     */
+    public function insert_or_update($data);
 
     /**
      * delete a record by id / key

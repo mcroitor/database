@@ -47,3 +47,5 @@ info("total 4 lines", $result);
 test(count($result) === 4);
 info("first line is theme => default", $result[0]);
 test($result[0]["name"] === "theme" && $result[0]["value"] === "default");
+
+$db->close();
