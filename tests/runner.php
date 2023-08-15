@@ -1,8 +1,8 @@
 <?php
 
-include __DIR__ . '/../src/mc/database.php';
-include __DIR__ . '/../src/mc/crud.php';
-include __DIR__ . '/../src/mc/query.php';
+include_once __DIR__ . '/../src/mc/database.php';
+include_once __DIR__ . '/../src/mc/crud.php';
+include_once __DIR__ . '/../src/mc/query.php';
 
 function test(bool $expression, string $passed = "PASS", string $failed = "FAIL"): void {
     echo $expression ? $passed : $failed;
@@ -17,6 +17,7 @@ function info(string $message, $object = null): void {
     echo PHP_EOL;
 }
 
-include("database_test.php");
-include("select_query_test.php");
-include("crud_test.php");
+include_once __DIR__ . "/database_test.php";
+include_once __DIR__ . "/select_query_test.php";
+include_once __DIR__ . "/crud_test.php";
+include_once __DIR__ . "/unique_values_test.php";
