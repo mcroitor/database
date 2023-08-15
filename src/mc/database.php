@@ -49,7 +49,6 @@ class database {
 
     /**
      * Common query method
-     * @global string $site
      * @param string $query
      * @param string $error
      * @param bool $need_fetch
@@ -163,8 +162,8 @@ class database {
     }
 
     /**
-     * Update fields <b>$values</b> in table <b>$table</b>. <b>$values</b> and 
-     * <b>$conditions</b> are required. 
+     * Update fields <b>$values</b> in table <b>$table</b>. <b>$values</b> and
+     * <b>$conditions</b> are required.
      * @param string $table
      * @param array $values
      * @param array $conditions
@@ -213,7 +212,7 @@ class database {
      */
     public function exists(string $table, array $where): bool {
         $result = $this->select($table, ["count(*) as count"], $where);
-        return count($result) > 0 && $result[0]["count"] > 0;
+        return !empty($result) && $result[0]["count"] > 0;
     }
 
     /**
@@ -223,6 +222,16 @@ class database {
      */
     public function unique_values(string $table, string $column): array {
         return $this->query_sql("SELECT {$column} FROM {$table} GROUP BY {$column}");
+    }
+
+    /**
+     * count unique values from column. Result is an array of elements {<column_value>, <count>}
+     * @param string $table
+     * @param string $column
+     * @return array
+     */
+    public function count_unique_values(string $table, string $column): array {
+        return $this->query_sql("SELECT {$column}, count({$column}) AS count FROM {$table} GROUP BY {$column}");
     }
     
     /**
