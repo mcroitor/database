@@ -6,6 +6,7 @@ info("<== query tests ==>");
 
 echo "pre-requisites: table `variables`, field `name`, field `value`" . PHP_EOL;
 
+// test 1.1
 echo "test 1.1: select query creation" . PHP_EOL;
 echo "\ttable in not set, fields are not set" . PHP_EOL;
 $MATCH_SELECT = "SELECT * FROM";
@@ -16,6 +17,7 @@ echo "\tmatch: {$MATCH_SELECT}, builded query: {$query}" . PHP_EOL;
 echo "\t";
 test($query === "SELECT * FROM");
 
+// test 1.2
 echo "test 1.2: select query selection" . PHP_EOL;
 echo "\tselect from table `variable` all fields" . PHP_EOL;
 
@@ -30,6 +32,7 @@ echo "\tmatch: {$MATCH_SELECT}, builded query: {$query}" . PHP_EOL;
 echo "\t";
 test($query === $MATCH_SELECT);
 
+// test 1.3
 echo "test 1.3: select query selection" . PHP_EOL;
 echo "\tselect from table `variable` first 5 values of `name` field" . PHP_EOL;
 
@@ -45,6 +48,7 @@ echo "\tmatch: {$MATCH_SELECT}, builded query: {$query}" . PHP_EOL;
 echo "\t";
 test($query === $MATCH_SELECT);
 
+// test 1.4
 echo "test 1.4: select query selection" . PHP_EOL;
 echo "\tselect from table `variable` field `value` where `name` field is equal to `theme`" . PHP_EOL;
 

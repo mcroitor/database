@@ -2,6 +2,8 @@
 
 namespace mc\sql;
 
+use PDO;
+
 /**
  * SQL query builder.
  */
@@ -23,6 +25,7 @@ class query {
     public const VALUES = "values";
     public const WHERE = "where";
     public const ORDER = "order";
+    public const GROUP = "group";
     public const LIMIT = "limit";
 
     protected const PATTERN = [
@@ -231,8 +234,12 @@ class query {
         $tmp = [];
         foreach ($this->where as $key => $value) {
             // TODO: quote values!
-            $tmp[] = "{$key}='{$value}'";
-        }
+            if (is_numeric($key)) {
+                $tmp[] = $value;
+            } else {
+                $tmp[] = "{$key}=$value";
+            }
+    }
         return " WHERE " . \implode(" AND ", $tmp);
     }
 
