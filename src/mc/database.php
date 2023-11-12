@@ -9,7 +9,8 @@ use mc\sql\query;
  *
  * @author Croitor Mihail <mcroitor@gmail.com>
  */
-class database {
+class database
+{
 
     public const LIMIT1 = [
         'limit' => 1,
@@ -32,7 +33,8 @@ class database {
 
     private $pdo;
 
-    public function __construct(string $dsn, ?string $login = null, ?string $password = null) {
+    public function __construct(string $dsn, ?string $login = null, ?string $password = null)
+    {
         try {
             $this->pdo = new \PDO($dsn, $login, $password);
         } catch (\Exception $ex) {
@@ -43,7 +45,8 @@ class database {
     /**
      * Close connection. After this queries are invalid and object recreating is obligatory.
      */
-    public function close() {
+    public function close()
+    {
         $this->pdo = null;
     }
 
@@ -54,7 +57,8 @@ class database {
      * @param bool $need_fetch
      * @return array
      */
-    public function query_sql(string $query, string $error = "Error: ", bool $need_fetch = true): array {
+    public function query_sql(string $query, string $error = "Error: ", bool $need_fetch = true): array
+    {
         $array = array();
         try {
             $result = $this->pdo->query($query);
@@ -71,7 +75,7 @@ class database {
                 $array = $result->fetchAll(\PDO::FETCH_ASSOC);
             }
         } catch (\PDOException $ex) {
-            exit ($ex->getMessage() . ", query: " . $query);
+            exit($ex->getMessage() . ", query: " . $query);
         }
         return $array;
     }
@@ -80,7 +84,8 @@ class database {
      * Method for dump parsing and execution
      * @param string $dump
      */
-    public function parse_sqldump(string $dump) {
+    public function parse_sqldump(string $dump)
+    {
         if (\file_exists($dump)) {
             $sql = \str_replace(["\n\r", "\r\n", "\n\n"], "\n", file_get_contents($dump));
             $queries = \explode(";", $sql);
@@ -98,7 +103,8 @@ class database {
      * @param string $string
      * @return string
      */
-    private function strip_sqlcomment(string $string = ''): string {
+    private function strip_sqlcomment(string $string = ''): string
+    {
         $RXSQLComments = '@(--[^\r\n]*)|(/\*[\w\W]*?(?=\*/)\*/)@ms';
         return (empty($string) ? '' : \preg_replace($RXSQLComments, '', $string));
     }
@@ -111,22 +117,26 @@ class database {
      * @param array $limit definition sample: ['offset' => '1', 'limit' => '100'].
      * @return array
      */
-    public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array {
+    public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array
+    {
         $fields = \implode(", ", $data);
 
         $query = "SELECT {$fields} FROM {$table}";
         if (!empty($where)) {
             $tmp = [];
             foreach ($where as $key => $value) {
-                $value = $this->pdo->quote($value);
-                $tmp[] = "{$key}=$value";
+                if (is_numeric($key)) {
+                    $tmp[] = $value;
+                } else {
+                    $value = $this->pdo->quote($value);
+                    $tmp[] = "{$key}=$value";
+                }
             }
             $query .= " WHERE " . \implode(" AND ", $tmp);
         }
         if (!empty($limit)) {
             $query .= " LIMIT {$limit['offset']}, {$limit['limit']}";
         }
-
         return $this->query_sql($query);
     }
 
@@ -137,7 +147,8 @@ class database {
      * @param array $where associative conditions.
      * @param string $limit definition sample: ['offset' => '1', 'limit' => '100'].
      */
-    public function select_column(string $table, string $column_name, array $where = [], array $limit = []): array {
+    public function select_column(string $table, string $column_name, array $where = [], array $limit = []): array
+    {
         $tmp = $this->select($table, [$column_name], $where, $limit);
         $result = [];
         foreach ($tmp as $value) {
@@ -152,10 +163,16 @@ class database {
      * @param array $conditions
      * @return array
      */
-    public function delete(string $table, array $conditions): array {
+    public function delete(string $table, array $conditions): array
+    {
         $tmp = [];
         foreach ($conditions as $key => $value) {
-            $tmp[] = "{$key}={$value}";
+            if (is_numeric($key)) {
+                $tmp[] = $value;
+            } else {
+                $value = $this->pdo->quote($value);
+                $tmp[] = "{$key}=$value";
+            }
         }
         $query = "DELETE FROM {$table} WHERE " . \implode(" AND ", $tmp);
         return $this->query_sql($query, "Error: ", false);
@@ -169,11 +186,16 @@ class database {
      * @param array $conditions
      * @return array
      */
-    public function update(string $table, array $values, array $conditions): array {
+    public function update(string $table, array $values, array $conditions): array
+    {
         $tmp1 = [];
         foreach ($conditions as $key => $value) {
-            $value = $this->pdo->quote($value);
-            $tmp1[] = "{$key}={$value}";
+            if (is_numeric($key)) {
+                $tmp1[] = $value;
+            } else {
+                $value = $this->pdo->quote($value);
+                $tmp1[] = "{$key}=$value";
+            }
         }
         $tmp2 = [];
         foreach ($values as $key => $value) {
@@ -191,7 +213,8 @@ class database {
      * @param array $values
      * @return string|false
      */
-    public function insert(string $table, array $values): string|false {
+    public function insert(string $table, array $values): string|false
+    {
         $columns = \implode(", ", \array_keys($values));
         // quoting values
         $quoted_values = \array_values($values);
@@ -210,7 +233,8 @@ class database {
      * @param array $where
      * @return bool
      */
-    public function exists(string $table, array $where): bool {
+    public function exists(string $table, array $where): bool
+    {
         $result = $this->select($table, ["count(*) as count"], $where);
         return !empty($result) && $result[0]["count"] > 0;
     }
@@ -220,7 +244,8 @@ class database {
      * @param string $table
      * @param string $column
      */
-    public function unique_values(string $table, string $column): array {
+    public function unique_values(string $table, string $column): array
+    {
         return $this->query_sql("SELECT {$column} FROM {$table} GROUP BY {$column}");
     }
 
@@ -230,16 +255,18 @@ class database {
      * @param string $column
      * @return array
      */
-    public function count_unique_values(string $table, string $column): array {
+    public function count_unique_values(string $table, string $column): array
+    {
         return $this->query_sql("SELECT {$column}, count({$column}) AS count FROM {$table} GROUP BY {$column}");
     }
-    
+
     /**
      * Execute a query object.
      * @param query $query
      * @return array
      */
-    public function exec(query $query): array {
+    public function exec(query $query): array
+    {
         return $this->query_sql($query->build(), "Error: ", $query->get_type() === query::SELECT);
     }
 }
