@@ -4,7 +4,7 @@ info("<== unique values database tests ==>");
 
 info("=== TEST GROUP 1 ===");
 
-$dbname = "sample.db";
+$dbname = __DIR__ . DIRECTORY_SEPARATOR . "sample.db";
 $table = "data";
 $columnName = "name";
 

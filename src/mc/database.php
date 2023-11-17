@@ -109,6 +109,25 @@ class database
         return (empty($string) ? '' : \preg_replace($RXSQLComments, '', $string));
     }
 
+    private function parse_where(array $where)
+    {
+        $tmp = [];
+        foreach ($where as $key => $value) {
+            if (is_numeric($key)) {
+                // is a value rule, add as is
+                $tmp[] = $value;
+            } else if (is_null($value)) {
+                // is null
+                $tmp[] = "{$key} is null";
+            } else {
+                // quote all other
+                $value = $this->pdo->quote($value);
+                $tmp[] = "{$key}=$value";
+            }
+        }
+        return $tmp;
+    }
+
     /**
      * Simplified selection.
      * @param string $table
@@ -123,16 +142,7 @@ class database
 
         $query = "SELECT {$fields} FROM {$table}";
         if (!empty($where)) {
-            $tmp = [];
-            foreach ($where as $key => $value) {
-                if (is_numeric($key)) {
-                    $tmp[] = $value;
-                } else {
-                    $value = $this->pdo->quote($value);
-                    $tmp[] = "{$key}=$value";
-                }
-            }
-            $query .= " WHERE " . \implode(" AND ", $tmp);
+            $query .= " WHERE " . \implode(" AND ", $this->parse_where($where));
         }
         if (!empty($limit)) {
             $query .= " LIMIT {$limit['offset']}, {$limit['limit']}";
@@ -165,16 +175,7 @@ class database
      */
     public function delete(string $table, array $conditions): array
     {
-        $tmp = [];
-        foreach ($conditions as $key => $value) {
-            if (is_numeric($key)) {
-                $tmp[] = $value;
-            } else {
-                $value = $this->pdo->quote($value);
-                $tmp[] = "{$key}=$value";
-            }
-        }
-        $query = "DELETE FROM {$table} WHERE " . \implode(" AND ", $tmp);
+        $query = "DELETE FROM {$table} WHERE " . \implode(" AND ", $this->parse_where($conditions));
         return $this->query_sql($query, "Error: ", false);
     }
 
@@ -188,22 +189,13 @@ class database
      */
     public function update(string $table, array $values, array $conditions): array
     {
-        $tmp1 = [];
-        foreach ($conditions as $key => $value) {
-            if (is_numeric($key)) {
-                $tmp1[] = $value;
-            } else {
-                $value = $this->pdo->quote($value);
-                $tmp1[] = "{$key}=$value";
-            }
-        }
         $tmp2 = [];
         foreach ($values as $key => $value) {
             $value = $this->pdo->quote($value);
             $tmp2[] = "{$key}={$value}";
         }
 
-        $query = "UPDATE {$table} SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $tmp1);
+        $query = "UPDATE {$table} SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $this->parse_where($conditions));
         return $this->query_sql($query, "Error: ", false);
     }
 
@@ -219,7 +211,12 @@ class database
         // quoting values
         $quoted_values = \array_values($values);
         foreach ($quoted_values as $key => $value) {
-            $quoted_values[$key] = $this->pdo->quote($value);
+            if (is_null($value)) {
+                $quoted_values[$key] = "null";
+            }
+            else {
+                $quoted_values[$key] = $this->pdo->quote($value);
+            }
         }
         $data = \implode(",  ", $quoted_values);
         $query = "INSERT INTO {$table} ($columns) VALUES ({$data})";

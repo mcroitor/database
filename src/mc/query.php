@@ -233,11 +233,16 @@ class query {
         }
         $tmp = [];
         foreach ($this->where as $key => $value) {
-            // TODO: quote values!
             if (is_numeric($key)) {
+                // is a value rule, add as is
                 $tmp[] = $value;
+            } else if (is_null($value)) {
+                // is null
+                $tmp[] = "{$key} is null";
             } else {
-                $tmp[] = "{$key}=$value";
+                // quote all other
+                $value = str_replace("'", "''", $value);
+                $tmp[] = "{$key}='{$value}'";
             }
     }
         return " WHERE " . \implode(" AND ", $tmp);

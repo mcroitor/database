@@ -5,7 +5,7 @@ info("<== CRUD tests ==>");
 info("=== TEST GROUP 1 ===");
 info("pre-requisites: table `variables`, field `name` - primary key, field `value`");
 
-$dbname = "./sample.db";
+$dbname = __DIR__ . DIRECTORY_SEPARATOR . "sample.db";
 
 info("prepare environment...");
 
