@@ -14,8 +14,6 @@ Project is composed from 3 classes:
   
 Limitations:
  * mysql and sqlite support
- * where conditions are limited with compare operator, use `query_sql` method if you want
-   to do something more complex 
 
 The `crud` class simplifies interogation with database.
 It provide only basic interface, based on table key:
@@ -110,6 +108,15 @@ class database {
     public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array;
 
     /**
+     * select column from table
+     * @param string $table
+     * @param string $column_name column name for selection.
+     * @param array $where associative conditions.
+     * @param string $limit definition sample: ['offset' => '1', 'limit' => '100'].
+     */
+    public function select_column(string $table, string $column_name, array $where = [], array $limit = []): array;
+
+    /**
      * Delete rows from table <b>$table</b>. Condition is required.
      * @param string $table
      * @param array $conditions
@@ -149,6 +156,14 @@ class database {
      * @param string $column
      */
     public function unique_values(string $table, string $column): array;
+
+    /**
+     * count unique values from column. Result is an array of elements {<column_value>, <count>}
+     * @param string $table
+     * @param string $column
+     * @return array
+     */
+    public function count_unique_values(string $table, string $column): array;
 
     /**
      * Execute a query object.
