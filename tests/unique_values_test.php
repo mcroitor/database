@@ -14,13 +14,13 @@ if (file_exists($dbname)) {
     unlink($dbname);
 }
 
-$db = new \mc\sql\database("sqlite:{$dbname}");
+$db = new \Mc\Sql\Database("sqlite:{$dbname}");
 
 $query = "CREATE TABLE {$table}
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
     {$columnName} TEXT, value TEXT)";
 
-$result = $db->query_sql($query);
+$result = $db->query($query);
 
 $data = [
     [$columnName => "color", "value" => "white"],
@@ -42,12 +42,12 @@ foreach ($data as $values) {
 }
 
 info("test 1.1: select unique values");
-$result = $db->unique_values($table, $columnName);
+$result = $db->uniqueValues($table, $columnName);
 info("total 3 unique values", $result);
 test(count($result) === 3);
 
 info("test 1.1: count unique values");
-$result = $db->count_unique_values($table, $columnName);
+$result = $db->countUniqueValues($table, $columnName);
 info("total 3 unique values", $result);
 test(count($result) === 3);
 

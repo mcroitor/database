@@ -2,9 +2,9 @@
 
 include __DIR__ . '/../src/mc/query.php';
 
-use mc\sql\query;
+use Mc\Sql\Query;
 
-$query = query::select()
+$query = Query::select()
     ->fields(['name', 'value'])
     ->table('variable')
     ->where(['name' => 'theme'])
@@ -14,7 +14,7 @@ $query = query::select()
 
 echo $query . PHP_EOL;
 
-$query = query::insert()
+$query = Query::insert()
     ->table('variable')
     ->fields(['name', 'value'])
     ->values(['name' => 'theme', 'value' => 'default'])
@@ -22,7 +22,7 @@ $query = query::insert()
 
 echo $query . PHP_EOL;
 
-$query = new query([
+$query = new Query([
     query::TYPE => query::SELECT,
     query::TABLE => 'variable',
     query::FIELDS => ['name', 'value'],

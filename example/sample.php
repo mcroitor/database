@@ -3,11 +3,11 @@
 include_once __DIR__ . '/../src/mc/database.php';
 include_once __DIR__ . '/../src/mc/query.php';
 
-$db = new \mc\sql\database("sqlite:sample.db");
+$db = new \Mc\Sql\Database("sqlite:sample.db");
 
 echo "prepare data" . PHP_EOL;
-$db->query_sql("DROP TABLE IF EXISTS variable");
-$db->query_sql("CREATE TABLE variable (name TEXT, value TEXT)");
+$db->query("DROP TABLE IF EXISTS variable");
+$db->query("CREATE TABLE variable (name TEXT, value TEXT)");
 
 $prop1 = ["name" => "theme", "value" => "default"];
 $id1 = $db->insert("variable", $prop1);
@@ -34,7 +34,7 @@ foreach ($variables as $variable) {
 echo "done." . PHP_EOL;
 
 echo "test query builder" . PHP_EOL;
-$query = \mc\sql\query::select()->fields(['name', 'value'])->table('variable')->where(['value' => '20']);
+$query = \Mc\Sql\Query::select()->fields(['name', 'value'])->table('variable')->where(['value' => '20']);
 
 $result = $db->exec($query);
 

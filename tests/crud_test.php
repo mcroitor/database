@@ -13,12 +13,12 @@ if (file_exists($dbname)) {
     unlink($dbname);
 }
 
-$db = new \mc\sql\database("sqlite:{$dbname}");
+$db = new \Mc\Sql\Database("sqlite:{$dbname}");
 
-$db->query_sql("CREATE TABLE variables (name TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL)");
+$db->query("CREATE TABLE variables (name TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL)");
 info("done.");
 
-$variables = new \mc\sql\crud($db, "variables", "name");
+$variables = new \Mc\Sql\Crud($db, "variables", "name");
 
 info("test 1.1: insert variable with name=language, value=en");
 
@@ -30,11 +30,11 @@ test($object == $extracted);
 
 info("test 1.2: insert_or_update variable with name=theme, value=default / insert");
 
-$variables->insert_or_update(["name" => "theme", "value" => "default"]);
+$variables->insertOrUpdate(["name" => "theme", "value" => "default"]);
 
 info("test 1.3: insert_or_update variable with name=theme, value=default / update");
 
-$result = $variables->insert_or_update(["name" => "theme", "value" => "default"]);
+$result = $variables->insertOrUpdate(["name" => "theme", "value" => "default"]);
 
 info("test 1.4: select variable with name=language");
 

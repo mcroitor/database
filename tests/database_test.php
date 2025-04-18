@@ -14,7 +14,7 @@ if (file_exists($dbname)) {
     unlink($dbname);
 }
 
-$db = new \mc\sql\database("sqlite:{$dbname}");
+$db = new \Mc\Sql\Database("sqlite:{$dbname}");
 
 test(file_exists($dbname));
 
@@ -23,7 +23,7 @@ info("test 1.2: create table {$table} - query_sql method");
 $query = "CREATE TABLE {$table} (name TEXT PRIMARY KEY, value TEXT)";
 info("query = ", $query);
 
-$result = $db->query_sql($query);
+$result = $db->query($query);
 $result = $db->select("sqlite_master", ["name"], ["type" => "table"]);
 test($result[0]["name"] === $table);
 

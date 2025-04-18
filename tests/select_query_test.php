@@ -1,6 +1,6 @@
 <?php
 
-use \mc\sql\query;
+use \Mc\Sql\Query;
 
 info("<== query tests ==>");
 
@@ -11,7 +11,7 @@ echo "test 1.1: select query creation" . PHP_EOL;
 echo "\ttable in not set, fields are not set" . PHP_EOL;
 $MATCH_SELECT = "SELECT * FROM";
 
-$query = query::select()->build();
+$query = Query::select()->build();
 
 echo "\tmatch: {$MATCH_SELECT}, builded query: {$query}" . PHP_EOL;
 echo "\t";
@@ -23,7 +23,7 @@ echo "\tselect from table `variable` all fields" . PHP_EOL;
 
 $MATCH_SELECT = "SELECT name, value FROM variable";
 
-$query = query::select()
+$query = Query::select()
     ->fields(['name', 'value'])
     ->table('variable')
     ->build();
@@ -38,7 +38,7 @@ echo "\tselect from table `variable` first 5 values of `name` field" . PHP_EOL;
 
 $MATCH_SELECT = "SELECT name FROM variable LIMIT 5 OFFSET 0";
 
-$query = query::select()
+$query = Query::select()
     ->fields(['name'])
     ->table('variable')
     ->limit(5)
@@ -54,7 +54,7 @@ echo "\tselect from table `variable` field `value` where `name` field is equal t
 
 $MATCH_SELECT = "SELECT value FROM variable WHERE name='theme'";
 
-$query = query::select()
+$query = Query::select()
     ->fields(['value'])
     ->table('variable')
     ->where(['name' => 'theme'])
