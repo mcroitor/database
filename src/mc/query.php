@@ -5,28 +5,29 @@ namespace Mc\Sql;
 /**
  * SQL query builder.
  */
-class Query {
+class Query
+{
     /**
      * supported commands
      */
-    public const SELECT = "SELECT";
-    public const INSERT = "INSERT";
-    public const UPDATE = "UPDATE";
-    public const DELETE = "DELETE";
+    public const string SELECT = "SELECT";
+    public const string INSERT = "INSERT";
+    public const string UPDATE = "UPDATE";
+    public const string DELETE = "DELETE";
 
     /**
      * query configuration parameters
      */
-    public const TYPE = "type";
-    public const TABLE = "table";
-    public const FIELDS = "fields";
-    public const VALUES = "values";
-    public const WHERE = "where";
-    public const ORDER = "order";
-    public const GROUP = "group";
-    public const LIMIT = "limit";
+    public const string TYPE = "type";
+    public const string TABLE = "table";
+    public const string FIELDS = "fields";
+    public const string VALUES = "values";
+    public const string WHERE = "where";
+    public const string ORDER = "order";
+    public const string GROUP = "group";
+    public const string LIMIT = "limit";
 
-    protected const PATTERN = [
+    protected const array PATTERN = [
         self::SELECT => "SELECT %fields% FROM %table%%where%%order%%limit%",
         self::INSERT => "INSERT INTO %table% (%fields%) VALUES (%values%)",
         self::UPDATE => "UPDATE %table% SET %values%%where%",
@@ -41,9 +42,10 @@ class Query {
     protected array $order = [];
     protected array $limit = [];
 
-    public function __construct(array $config){
+    public function __construct(array $config)
+    {
         foreach ($config as $key => $value) {
-            if(property_exists($this, $key)){
+            if (\property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
@@ -53,7 +55,8 @@ class Query {
      * return query command type
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->type;
     }
 
@@ -61,7 +64,8 @@ class Query {
      * create query for select
      * @return Query
      */
-    public static function select(): Query{
+    public static function select(): Query
+    {
         return new Query([
             self::TYPE => self::SELECT,
         ]);
@@ -71,7 +75,8 @@ class Query {
      * create query for insert
      * @return Query
      */
-    public static function insert(): Query{
+    public static function insert(): Query
+    {
         return new Query([
             self::TYPE => self::INSERT,
         ]);
@@ -81,7 +86,8 @@ class Query {
      * create query for update
      * @return Query
      */
-    public static function update(): Query{
+    public static function update(): Query
+    {
         return new Query([
             self::TYPE => self::UPDATE,
         ]);
@@ -91,7 +97,8 @@ class Query {
      * create query for delete
      * @return Query
      */
-    public static function delete(): Query{
+    public static function delete(): Query
+    {
         return new Query([
             self::TYPE => self::DELETE,
         ]);
@@ -101,7 +108,8 @@ class Query {
      * clone a query
      * @return Query
      */
-    public function clone(): Query {
+    public function clone(): Query
+    {
         return new Query([
             self::TYPE => $this->type,
             self::TABLE => $this->table,
@@ -118,7 +126,8 @@ class Query {
      * @param array $fields
      * @return Query
      */
-    public function fields(array $fields): Query {
+    public function fields(array $fields): Query
+    {
         $result = $this->clone();
         $result->fields = $fields;
         return $result;
@@ -129,7 +138,8 @@ class Query {
      * @param array $values
      * @return Query
      */
-    public function values(array $values): Query {
+    public function values(array $values): Query
+    {
         $result = $this->clone();
         $result->values = $values;
         return $result;
@@ -140,7 +150,8 @@ class Query {
      * @param array $where
      * @return Query
      */
-    public function where(array $where): Query {
+    public function where(array $where): Query
+    {
         $result = $this->clone();
         $result->where = $where;
         return $result;
@@ -151,7 +162,8 @@ class Query {
      * @param array $order
      * @return Query
      */
-    public function order(array $order): Query {
+    public function order(array $order): Query
+    {
         $result = $this->clone();
         $result->order = $order;
         return $result;
@@ -159,10 +171,12 @@ class Query {
 
     /**
      * set limit conditions and return new query
-     * @param array $limit
+     * @param int $limit
+     * @param int $offset
      * @return Query
      */
-    public function limit(int $limit, int $offset = 0): Query {
+    public function limit(int $limit, int $offset = 0): Query
+    {
         $result = $this->clone();
         $result->limit = [
             'offset' => $offset,
@@ -176,7 +190,8 @@ class Query {
      * @param string $table
      * @return Query
      */
-    public function table(string $table): Query {
+    public function table(string $table): Query
+    {
         $result = $this->clone();
         $result->table = $table;
         return $result;
@@ -186,9 +201,10 @@ class Query {
      * return query string
      * @return string
      */
-    public function build(): string {
+    public function build(): string
+    {
         $replace = [
-            "%table%" => $this->table,
+            "%table%" => $this->escapeIdentifier($this->table),
             "%fields%" => $this->buildFields(),
             "%values%" => $this->buildValues(),
             "%where%" => $this->buildWhere(),
@@ -202,47 +218,71 @@ class Query {
      * return fields string
      * @return string
      */
-    protected function buildFields(): string {
-        if(empty($this->fields)){
+    protected function buildFields(): string
+    {
+        if (empty($this->fields)) {
             return "*";
         }
-        return \implode(", ", $this->fields);
+        return \implode(", ", array_map([$this, 'escapeIdentifier'], $this->fields));
+    }
+
+    /**
+     * Escape identifier (table/column name) with backticks
+     * @param string $identifier
+     * @return string
+     */
+    private function escapeIdentifier(string $identifier): string
+    {
+        if ($identifier === '*') {
+            return $identifier;
+        }
+        return '`' . str_replace('`', '``', $identifier) . '`';
     }
 
     /**
      * return values string
      * @return string
      */
-    protected function buildValues(): string {
-        if(empty($this->values)){
+    protected function buildValues(): string
+    {
+        if (empty($this->values)) {
             return "";
         }
-        // TODO: quote values!
-        return \implode(", ", $this->values);
+        $quoted = [];
+        foreach ($this->values as $value) {
+            if ($value === null) {
+                $quoted[] = "NULL";
+            } else if (\is_numeric($value)) {
+                $quoted[] = $value;
+            } else {
+                $quoted[] = "'" . str_replace("'", "''", $value) . "'";
+            }
+        }
+        return \implode(", ", $quoted);
     }
 
     /**
      * return where string
      * @return string
      */
-    protected function buildWhere(): string {
-        if(empty($this->where)){
+    protected function buildWhere(): string
+    {
+        if (empty($this->where)) {
             return "";
         }
         $tmp = [];
         foreach ($this->where as $key => $value) {
-            if (is_numeric($key)) {
+            if (\is_numeric($key)) {
                 // is a value rule, add as is
                 $tmp[] = $value;
-            } else if (is_null($value)) {
+            } else if ($value === null) {
                 // is null
-                $tmp[] = "{$key} is null";
-            } else {
-                // quote all other
-                $value = str_replace("'", "''", $value);
-                $tmp[] = "{$key}='{$value}'";
+                $tmp[] = $this->escapeIdentifier($key) . " IS NULL";
             }
-    }
+            // quote all other
+            $quoted = \is_numeric($value) ? $value : "'" . str_replace("'", "''", $value) . "'";
+            $tmp[] = $this->escapeIdentifier($key) . " = {$quoted}";
+        }
         return " WHERE " . \implode(" AND ", $tmp);
     }
 
@@ -250,13 +290,14 @@ class Query {
      * return order string
      * @return string
      */
-    protected function buildOrder(): string {
-        if(empty($this->order)){
+    protected function buildOrder(): string
+    {
+        if (empty($this->order)) {
             return "";
         }
         $tmp = [];
         foreach ($this->order as $key => $value) {
-            $tmp[] = "{$key} {$value}";
+            $tmp[] = $this->escapeIdentifier($key) . " " . strtoupper($value);
         }
         return " ORDER BY " . \implode(", ", $tmp);
     }
@@ -265,13 +306,14 @@ class Query {
      * return limit string
      * @return string
      */
-    protected function buildLimit(): string {
-        if(!$this->limit){
+    protected function buildLimit(): string
+    {
+        if (!$this->limit) {
             return "";
         }
         $tmp = [];
         $tmp[] = "LIMIT " . $this->limit["limit"];
-        if(isset($this->limit["offset"])){
+        if (isset($this->limit["offset"])) {
             $tmp[] = "OFFSET " . $this->limit["offset"];
         }
         return " " . \implode(" ", $tmp);
@@ -281,7 +323,8 @@ class Query {
      * convert query object to string
      * @return string
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->build();
     }
 }

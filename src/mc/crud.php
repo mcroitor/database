@@ -9,18 +9,18 @@ use \Mc\Sql\Database;
  */
 class Crud
 {
-    private $db;
-    private $table;
-    private $key;
+    private Database $db;
+    private string $table;
+    private string $key;
 
     /**
      * crud constructor, must be passed a database object and a table name
      * the key is the primary key of the table, defaults to 'id' 
-     * @param database $db
+     * @param Database $db
      * @param string $table
      * @param string $key
      */
-    public function __construct(database $db, string $table, $key = "id")
+    public function __construct(Database $db, string $table, string $key = "id")
     {
         $this->db = $db;
         $this->table = $table;
@@ -47,8 +47,8 @@ class Crud
      */
     public function select(int|string $id): array
     {
-        $result = $this->db->select($this->table(), ["*"], [$this->key() => $id], database::LIMIT1);
-        if (count($result) === 0) {
+        $result = $this->db->select($this->table(), ["*"], [$this->key() => $id], Database::LIMIT1);
+        if (\count($result) === 0) {
             return [];
         }
         return $result[0];
@@ -90,13 +90,13 @@ class Crud
      */
     public function insertOrUpdate(array|object $data): array|string|false
     {
+        $data = (array)$data;
         /// no key - insert object
-        if (empty($data[$this->key])) {
+        if (empty($data[$this->key()])) {
             return $this->insert($data);
         }
 
-        $key = $data[$this->key];
-        echo "[debug] key found " . $key . PHP_EOL;
+        $key = $data[$this->key()];
         $result = $this->select($key);
         /// object not found, insert object
         if (empty($result)) {
@@ -145,6 +145,6 @@ class Crud
     public function count(): int
     {
         $result = $this->db->select($this->table(), ["count(*) as count"]);
-        return intval($result[0]["count"]);
+        return \intval($result[0]["count"]);
     }
 }

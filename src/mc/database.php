@@ -12,33 +12,46 @@ use Mc\Sql\Query;
 class Database
 {
 
-    public const LIMIT1 = [
+    public const array LIMIT1 = [
         'limit' => 1,
         'offset' => 0
     ];
-    public const LIMIT10 = [
+    public const array LIMIT10 = [
         'limit' => 10,
         'offset' => 0
     ];
-    public const LIMIT20 = [
+    public const array LIMIT20 = [
         'limit' => 20,
         'offset' => 0
     ];
-    public const LIMIT100 = [
+    public const array LIMIT100 = [
         'limit' => 100,
         'offset' => 0
     ];
 
-    public const ALL = ["*"];
+    public const array ALL = ["*"];
 
-    private $pdo;
+    private \PDO|null $pdo;
+
+    /**
+     * Escape identifier (table/column name) with backticks
+     * @param string $identifier
+     * @return string
+     */
+    private function escapeIdentifier(string $identifier): string
+    {
+        if ($identifier === '*') {
+            return $identifier;
+        }
+        return '`' . str_replace('`', '``', $identifier) . '`';
+    }
 
     public function __construct(string $dsn, ?string $login = null, ?string $password = null)
     {
         try {
             $this->pdo = new \PDO($dsn, $login, $password);
         } catch (\Exception $ex) {
-            die("DB init Error: " . $ex->getMessage() . "DSN = {$dsn}");
+            throw new \RuntimeException("DB init Error: " . $ex->getMessage() . "DSN = {$dsn}");
         }
     }
 
@@ -69,13 +82,13 @@ class Database
                     . $this->pdo->errorInfo()[1]
                     . ", message = "
                     . $this->pdo->errorInfo()[2];
-                exit($aux);
+                throw new \RuntimeException($aux);
             }
             if ($need_fetch) {
                 $array = $result->fetchAll(\PDO::FETCH_ASSOC);
             }
         } catch (\PDOException $ex) {
-            exit($ex->getMessage() . ", query: " . $query);
+            throw new \RuntimeException($ex->getMessage() . ", query: " . $query, 0, $ex);
         }
         return $array;
     }
@@ -109,20 +122,20 @@ class Database
         return (empty($string) ? '' : \preg_replace($RXSQLComments, '', $string));
     }
 
-    private function parseWhere(array $where)
+    private function parseWhere(array $where): array
     {
         $tmp = [];
         foreach ($where as $key => $value) {
             if (is_numeric($key)) {
                 // is a value rule, add as is
                 $tmp[] = $value;
-            } else if (is_null($value)) {
+            } else if ($value === null) {
                 // is null
-                $tmp[] = "{$key} is null";
+                $tmp[] = $this->escapeIdentifier($key) . " IS NULL";
             } else {
                 // quote all other
                 $value = $this->pdo->quote($value);
-                $tmp[] = "{$key}=$value";
+                $tmp[] = $this->escapeIdentifier($key) . " = {$value}";
             }
         }
         return $tmp;
@@ -138,14 +151,14 @@ class Database
      */
     public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array
     {
-        $fields = \implode(", ", $data);
+        $fields = \implode(", ", array_map([$this, 'escapeIdentifier'], $data));
 
-        $query = "SELECT {$fields} FROM {$table}";
+        $query = "SELECT {$fields} FROM " . $this->escapeIdentifier($table);
         if (!empty($where)) {
             $query .= " WHERE " . \implode(" AND ", $this->parseWhere($where));
         }
         if (!empty($limit)) {
-            $query .= " LIMIT {$limit['offset']}, {$limit['limit']}";
+            $query .= " LIMIT " . (int)$limit['offset'] . ", " . (int)$limit['limit'];
         }
         return $this->query($query);
     }
@@ -156,6 +169,7 @@ class Database
      * @param string $column_name column name for selection.
      * @param array $where associative conditions.
      * @param array $limit definition sample: ['offset' => '1', 'limit' => '100'].
+     * @return array
      */
     public function selectColumn(string $table, string $column_name, array $where = [], array $limit = []): array
     {
@@ -175,7 +189,7 @@ class Database
      */
     public function delete(string $table, array $conditions): array
     {
-        $query = "DELETE FROM {$table} WHERE " . \implode(" AND ", $this->parseWhere($conditions));
+        $query = "DELETE FROM " . $this->escapeIdentifier($table) . " WHERE " . \implode(" AND ", $this->parseWhere($conditions));
         return $this->query($query, "Error: ", false);
     }
 
@@ -191,11 +205,11 @@ class Database
     {
         $tmp2 = [];
         foreach ($values as $key => $value) {
-            $value = $this->pdo->quote($value);
-            $tmp2[] = "{$key}={$value}";
+            $quoted = ($value === null) ? "NULL" : $this->pdo->quote($value);
+            $tmp2[] = $this->escapeIdentifier($key) . " = {$quoted}";
         }
 
-        $query = "UPDATE {$table} SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $this->parseWhere($conditions));
+        $query = "UPDATE " . $this->escapeIdentifier($table) . " SET " . \implode(", ", $tmp2) . " WHERE " . implode(" AND ", $this->parseWhere($conditions));
         return $this->query($query, "Error: ", false);
     }
 
@@ -207,19 +221,14 @@ class Database
      */
     public function insert(string $table, array $values): string|false
     {
-        $columns = \implode(", ", \array_keys($values));
+        $columns = \implode(", ", array_map([$this, 'escapeIdentifier'], \array_keys($values)));
         // quoting values
         $quoted_values = \array_values($values);
         foreach ($quoted_values as $key => $value) {
-            if (is_null($value)) {
-                $quoted_values[$key] = "null";
-            }
-            else {
-                $quoted_values[$key] = $this->pdo->quote($value);
-            }
+            $quoted_values[$key] = ($value === null) ? "NULL" : $this->pdo->quote($value);
         }
-        $data = \implode(",  ", $quoted_values);
-        $query = "INSERT INTO {$table} ($columns) VALUES ({$data})";
+        $data = \implode(", ", $quoted_values);
+        $query = "INSERT INTO " . $this->escapeIdentifier($table) . " ({$columns}) VALUES ({$data})";
         $this->query($query, "Error: ", false);
         return $this->pdo->lastInsertId();
     }
@@ -243,6 +252,8 @@ class Database
      */
     public function uniqueValues(string $table, string $column): array
     {
+        $table = $this->escapeIdentifier($table);
+        $column = $this->escapeIdentifier($column);
         return $this->query("SELECT {$column} FROM {$table} GROUP BY {$column}");
     }
 
@@ -254,6 +265,8 @@ class Database
      */
     public function countUniqueValues(string $table, string $column): array
     {
+        $table = $this->escapeIdentifier($table);
+        $column = $this->escapeIdentifier($column);
         return $this->query("SELECT {$column}, count({$column}) AS count FROM {$table} GROUP BY {$column}");
     }
 
@@ -264,6 +277,6 @@ class Database
      */
     public function exec(Query $query): array
     {
-        return $this->query($query->build(), "Error: ", $query->getType() === query::SELECT);
+        return $this->query($query->build(), "Error: ", $query->getType() === Query::SELECT);
     }
 }
