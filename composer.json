@@ -1,0 +1,20 @@
+{
+    "name": "mcroitor/database",
+    "description": "Simple PHP library, PDO wrapper.",
+    "type": "library",
+    "license": "Unlicense license",
+    "authors": [
+        {
+            "name": "mcroitor",
+            "homepage": "https://github.com/mcroitor"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mc\\Sql\\": "src/mc/"
+        }
+    }
+}
