@@ -33,6 +33,11 @@ foreach ($variables as $variable) {
 }
 echo "done." . PHP_EOL;
 
+echo "test select named fields" . PHP_EOL;
+$totalVariables = $db->select("variable", ["count(name)" => "total"])[0]["total"];
+echo "total variables: {$totalVariables}" . PHP_EOL;
+echo "done." . PHP_EOL;
+
 echo "test query builder" . PHP_EOL;
 $query = \Mc\Sql\Query::select()->fields(['name', 'value'])->table('variable')->where(['value' => '20']);
 

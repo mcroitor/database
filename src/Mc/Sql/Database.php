@@ -151,7 +151,15 @@ class Database
      */
     public function select(string $table, array $data = ['*'], array $where = [], array $limit = []): array
     {
-        $fields = \implode(", ", array_map([$this, 'escapeIdentifier'], $data));
+        $fieldsArray = [];
+        foreach ($data as $key => $value) {
+            if(is_numeric($key)) {
+                $fieldsArray[] = $this->escapeIdentifier($value);
+            } else {
+                $fieldsArray[] = "{$key} AS " . $this->escapeIdentifier($value);
+            }
+        }
+        $fields = \implode(", ", $fieldsArray);
 
         $query = "SELECT {$fields} FROM " . $this->escapeIdentifier($table);
         if (!empty($where)) {
