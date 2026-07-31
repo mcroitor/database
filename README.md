@@ -1,4 +1,4 @@
-# database
+# \Mc\Sql\Database
 
 Simple PHP library, PDO wrapper. Library provides an SQL builder also. You always can use `database.php` file directly, it has only one dependency, from `query` class. Feel free to remove exec method if you don't use it.
 

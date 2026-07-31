@@ -279,4 +279,25 @@ class Database
     {
         return $this->query($query->build(), "Error: ", $query->getType() === Query::SELECT);
     }
+
+    /**
+     * prepare a query object.
+     * @param string $query
+     * @return \PDOStatement
+     */
+    public function prepare(string $query): \PDOStatement {
+        return $this->pdo->prepare($query);
+    }
+
+    /**
+     * Execute a prepared statement with parameters.
+     * @param \PDOStatement $stmt
+     * @param array $params
+     * @return array
+     */
+    public function do(\PDOStatement $stmt, array $params = []): array
+    {
+        $stmt->execute($params);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

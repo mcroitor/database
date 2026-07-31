@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . '/../src/mc/query.php';
+include __DIR__ . '/../src/Mc/Sql/Query.php';
 
 use Mc\Sql\Query;
 
@@ -23,12 +23,12 @@ $query = Query::insert()
 echo $query . PHP_EOL;
 
 $query = new Query([
-    query::TYPE => query::SELECT,
-    query::TABLE => 'variable',
-    query::FIELDS => ['name', 'value'],
-    query::WHERE => ['name' => 'theme'],
-    query::ORDER => ['name' => 'ASC'],
-    query::LIMIT => ['limit' => 1],
+    Query::TYPE => Query::SELECT,
+    Query::TABLE => 'variable',
+    Query::FIELDS => ['name', 'value'],
+    Query::WHERE => ['name' => 'theme'],
+    Query::ORDER => ['name' => 'ASC'],
+    Query::LIMIT => ['limit' => 1],
 ]);
 
 echo $query->build() . PHP_EOL;

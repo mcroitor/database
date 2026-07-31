@@ -54,3 +54,5 @@ $result = $variables->update($data);
 $result = $variables->select("language");
 info("selected data", $result);
 test($result["name"] === "language" && $result["value"] === "ru");
+
+$db->close();

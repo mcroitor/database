@@ -1,7 +1,7 @@
 <?php
 
-include_once __DIR__ . '/../src/mc/database.php';
-include_once __DIR__ . '/../src/mc/query.php';
+include_once __DIR__ . '/../src/Mc/Sql/Database.php';
+include_once __DIR__ . '/../src/Mc/Sql/Query.php';
 
 $db = new \Mc\Sql\Database("sqlite:sample.db");
 

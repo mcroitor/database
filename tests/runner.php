@@ -1,8 +1,8 @@
 <?php
 
-include_once __DIR__ . '/../src/mc/database.php';
-include_once __DIR__ . '/../src/mc/crud.php';
-include_once __DIR__ . '/../src/mc/query.php';
+include_once __DIR__ . '/../src/Mc/Sql/Database.php';
+include_once __DIR__ . '/../src/Mc/Sql/Crud.php';
+include_once __DIR__ . '/../src/Mc/Sql/Query.php';
 
 function test(bool $expression, string $passed = "PASS", string $failed = "FAIL"): void {
     echo $expression ? $passed : $failed;
