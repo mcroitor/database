@@ -153,8 +153,8 @@ class Database
     {
         $fieldsArray = [];
         foreach ($data as $key => $value) {
-            if(is_numeric($key)) {
-                $fieldsArray[] = $this->escapeIdentifier($value);
+            if(is_numeric($key) || $value === '*' || strpos($value, '(') !== false || strpos($value, 'COUNT') !== false) {
+                $fieldsArray[] = $value;
             } else {
                 $fieldsArray[] = "{$key} AS " . $this->escapeIdentifier($value);
             }

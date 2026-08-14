@@ -4,19 +4,14 @@ info("<== database tests ==>");
 
 info("=== TEST GROUP 1 ===");
 
-$dbname = __DIR__ . DIRECTORY_SEPARATOR . "sample.db";
 $table = "variables";
 
 // test 1.1
-info("test 1.1: create database {$dbname}");
+info("test 1.1: create database in-memory");
 
-if (file_exists($dbname)) {
-    unlink($dbname);
-}
+$db = new \Mc\Sql\Database("sqlite::memory:");
 
-$db = new \Mc\Sql\Database("sqlite:{$dbname}");
-
-test(file_exists($dbname));
+test(true); // DB is created in memory
 
 // test 1.2
 info("test 1.2: create table {$table} - query_sql method");
@@ -77,5 +72,19 @@ info("total 1 lines", $result);
 test(count($result) === 1);
 info("first line is theme => default", $result[0]);
 test($result[0]["name"] === "theme" && $result[0]["value"] === "default");
+
+info("test 1.8: selectColumn method");
+$names = $db->selectColumn($table, "name");
+test(count($names) === $total_data);
+test($names[0] === "theme");
+
+info("test 1.9: parseSqlDump method");
+// create a temp dump file
+$dumpFile = __DIR__ . "/temp_dump.sql";
+file_put_contents($dumpFile, "CREATE TABLE dump_test (id INTEGER PRIMARY KEY, val TEXT); INSERT INTO dump_test (val) VALUES ('dump_val');");
+$db->parseSqlDump($dumpFile);
+$res = $db->select("dump_test");
+test(count($res) === 1 && $res[0]["val"] === "dump_val");
+unlink($dumpFile);
 
 $db->close();

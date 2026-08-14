@@ -84,11 +84,10 @@ class Crud
      * updated, otherwise new line will be inserted.
      *
      * @param array|object $data
-     * @return array if object is updated
-     * @return string if object is inserted, the id of the new object
+     * @return string if object is inserted or updated, the id of the object
      * @return false if object is not inserted or updated
      */
-    public function insertOrUpdate(array|object $data): array|string|false
+    public function insertOrUpdate(array|object $data): string|false
     {
         $data = (array)$data;
         /// no key - insert object
@@ -104,7 +103,33 @@ class Crud
         }
 
         /// update object
-        return $this->update($data);
+        $this->update($data);
+        return (string)$data[$this->key()];
+    }
+
+    /**
+     * if $data object contains key property and the key is found in the table, the object will be ignored.
+     * otherwise new line will be inserted.
+     * @param array|object $data
+     * @return bool|string
+     */
+    public function insertOrIgnore(array|object $data): string|false
+    {
+        $data = (array)$data;
+        /// no key - insert object
+        if (empty($data[$this->key()])) {
+            return $this->insert($data);
+        }
+
+        $key = $data[$this->key()];
+        $result = $this->select($key);
+        /// object not found, insert object
+        if (empty($result)) {
+            return $this->insert($data);
+        }
+
+        /// ignore object
+        return false;
     }
 
     /**
@@ -144,7 +169,29 @@ class Crud
      */
     public function count(): int
     {
-        $result = $this->db->select($this->table(), ["count(*) as count"]);
-        return \intval($result[0]["count"]);
+        $result = $this->db->select($this->table(), ["count(*)"], [], []);
+        // since we use count(*) without alias, PDO usually returns it as 'count(*)' or similar
+        $val = current($result[0]);
+        return \intval($val);
+    }
+
+    /**
+     * return the database object, used for all CRUD operations
+     * @return Database
+     */
+    public function getDb(): Database
+    {
+        return $this->db;
+    }
+
+    /**
+     * filter records by where clause
+     * 
+     * @param array $where
+     * @return array
+     */
+    public function filter(array $where = []): array
+    {
+        return $this->db->select($this->table(), ["*"], $where);
     }
 }

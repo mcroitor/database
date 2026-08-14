@@ -1,8 +1,16 @@
 # \Mc\Sql\Database
 
-Simple PHP library, PDO wrapper. Library provides an SQL builder also. You always can use `database.php` file directly, it has only one dependency, from `query` class. Feel free to remove exec method if you don't use it.
+Simple PHP library, PDO wrapper. Library provides an SQL builder also. Project is defined into `\Mc\Sql` namespace.
 
-Project is defined into `\Mc\Sql` namespace;
+## Installation
+
+You can install the library by cloning the repository and including the files in your project, or by using Composer if you have defined it in your local package repository:
+
+```bash
+git clone https://github.com/your-repo/database.git
+```
+
+Ensure that the `PDO` extension is enabled in your `php.ini` configuration.
 
 Project is composed from 3 classes:
 
@@ -12,16 +20,20 @@ Project is composed from 3 classes:
   
 Limitations:
 
-- mysql and sqlite support
+- MySql / MariaDB and sqlite support (compatible with most PDO drivers supporting LIMIT/OFFSET)
 
-The `Crud` class simplifies interogation with database.
-It provide only basic interface, based on table key:
+The `Crud` class simplifies interaction with the database.
+It provides a basic interface based on a table primary key:
 
 - `insert` - creates record in the table, returns id.
 - `select` - returns a record by id.
 - `all` - returns an array of records.
 - `update` - updates record by id.
 - `delete` - removes record by id.
+- `insertOrUpdate` - inserts if missing, otherwise updates.
+- `insertOrIgnore` - inserts only if record doesn't exist.
+- `count` - returns total number of records in the table.
+- `filter` - returns records matching a where clause.
 
 ## examples
 
@@ -47,18 +59,27 @@ $variables = $db->select("variables");
 
 ### query builder
 
-Build select query:
+Build a select query:
 
 ```php
 use Mc\Sql\Query;
 
-// query builder
+// basic select query
 $query_builder = Query::select()->table('variable');
-echo $query_builder->build();
+echo $query_builder->build(); // SELECT * FROM variable
 
-// select only 'name', 'value' fields
-$query_builder = $query_builder->fields(['name', 'value']);
-echo $query_builder->build();
+// select only 'name', 'value' fields and add limit
+$query_builder = $query_builder->fields(['name', 'value'])->limit(10, 0);
+echo $query_builder->build(); // SELECT name, value FROM variable LIMIT 0, 10
+```
+
+Build an update query:
+
+```php
+$update = Query::update()->table('variable')
+    ->values(['value' => 'new_value'])
+    ->where(['name' => 'some_variable']);
+echo $update->build(); // UPDATE variable SET value = 'new_value' WHERE name = 'some_variable'
 ```
 
 ### crud
@@ -75,7 +96,16 @@ $language = $variable->select("language");
 echo $language["name"] . ": " . $language["value"] . PHP_EOL;
 ```
 
+// Filter records by where clause
+$all_english = $variable->filter(['language' => 'en']);
+
+// Count total records in table
+$count = $variable->count();
+echo "Total variables: " . $count . PHP_EOL;
+
 ## interface
+
+### Mc\Sql\Database
 
 The `\Mc\Sql\Database` class interface:
 
@@ -197,6 +227,8 @@ class Database
     public function exec(Query $query): array;
 }
 ```
+
+### Mc\Sql\Query
 
 The `\Mc\Sql\Query` class interface:
 
@@ -321,6 +353,8 @@ class Query {
 }
 ```
 
+### Mc\Sql\Crud
+
 The `\Mc\Sql\Crud` class interface:
 
 ```php
@@ -416,3 +450,7 @@ class Crud
     public function count(): int;
 }
 ```
+
+## License
+
+This project is released into the **Public Domain**. You are free to copy, modify, publish, use, compile, sell, or distribute this software for any purpose.
